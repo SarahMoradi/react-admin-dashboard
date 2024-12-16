@@ -1,7 +1,9 @@
+/* eslint-disable jsx-a11y/alt-text */
 import logo from '@assets/images/logo.svg'
+import {useEffect} from 'react'
 import {useForm} from 'react-hook-form'
+import {useTranslation} from 'react-i18next'
 import {
-  Form,
   Link,
   useActionData,
   useNavigate,
@@ -9,17 +11,15 @@ import {
   useRouteError,
   useSubmit,
 } from 'react-router-dom'
-import {httpsService} from '../../../core/http-service'
-import {useEffect} from 'react'
-import { useTranslation } from 'react-i18next'
+import {httpsService} from '@core/http-service'
 const Register = () => {
-  // register for validation
   const {
     register,
     handleSubmit,
     watch,
     formState: {errors},
   } = useForm()
+  const {t} = useTranslation()
 
   const submitForm = useSubmit()
 
@@ -27,37 +27,33 @@ const Register = () => {
     const {confirmPassword, ...userData} = data
     submitForm(userData, {method: 'post'})
   }
-
   const navigation = useNavigation()
-  const isSubmitting = navigation.state === 'submitting'
-  // const isSubmitting = navigation.state !== idle"
+  const isSubmitting = navigation.state !== 'idle'
 
-  //the value i return from registerAction
+  const routeErrors = useRouteError()
   const isSuccessOperation = useActionData()
 
   const navigate = useNavigate()
+
   useEffect(() => {
     if (isSuccessOperation) {
       setTimeout(() => {
         navigate('/login')
-      }, 2000)
+      }, 3000)
     }
   }, [isSuccessOperation])
-
-  const routeError = useRouteError()
-
-  const {t} = useTranslation();
 
   return (
     <>
       <div className='text-center mt-4'>
-        <img src={logo} style={{height: '100px'}} alt='logo' />
-        <h1 className='h2'>پلتفرم آموزش آنلاین</h1>
-        <p className='lead'>جهت استفاده از ویژگی های پلتفرم آموزش آنلاین کلاسبن ثبت نام کنید</p>
+        <img src={logo} style={{height: '100px'}} />
+        <h1 className='h2'>{t('register.title')}</h1>
+        <p className='lead'>{t('register.introMessage')}</p>
         <p className='lead'>
-          قبلا ثبت نام کرده اید؟
+          {t('register.alreadyRegistered')}
+          &nbsp;
           <Link to='/login' className='me-2'>
-            وارد شوید{' '}
+            {t('register.signin')}
           </Link>
         </p>
       </div>
@@ -65,46 +61,50 @@ const Register = () => {
       <div className='card'>
         <div className='card-body'>
           <div className='m-sm-4'>
-            {/* import Form from react-router-dom */}
-            <Form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className='mb-3'>
-                <label className='form-label'>موبایل</label>
-                {/* validation by register */}
+                <label className='form-label'>{t('register.mobile')}</label>
                 <input
                   {...register('mobile', {
-                    required: 'موبایل الزامی است',
+                    required: true,
                     minLength: 11,
                     maxLength: 11,
                   })}
                   className={`form-control form-control-lg ${errors.mobile && 'is-invalid'}`}
                 />
                 {errors.mobile && errors.mobile.type === 'required' && (
-                  <p className='text-danger small fw-bolder mt-1'>{errors.mobile?.message}</p>
+                  <p className='text-danger small fw-bolder mt-1'>
+                    {t('register.validation.mobileRequired')}
+                  </p>
                 )}
                 {errors.mobile &&
                   (errors.mobile.type === 'minLength' || errors.mobile.type === 'maxLength') && (
-                    <p className='text-danger small fw-bolder mt-1'>موبایل باید 11 رقم باشد</p>
+                    <p className='text-danger small fw-bolder mt-1'>
+                      {t('register.validation.mobileLength')}
+                    </p>
                   )}
               </div>
               <div className='mb-3'>
-                <label className='form-label'>رمز عبور</label>
+                <label className='form-label'>{t('register.password')}</label>
                 <input
-                  {...register('password', {required: 'رمز عبور الزامی است'})}
+                  {...register('password', {required: true})}
                   className={`form-control form-control-lg ${errors.password && 'is-invalid'}`}
                   type='password'
                 />
-                {errors.password && (
-                  <p className='text-danger small fw-bolder mt-1'>{errors.password?.message}</p>
+                {errors.password && errors.password.type === 'required' && (
+                  <p className='text-danger small fw-bolder mt-1'>
+                    {t('register.validation.passwordRequired')}
+                  </p>
                 )}
               </div>
               <div className='mb-3'>
-                <label className='form-label'>تکرار رمز عبور</label>
+                <label className='form-label'>{t('register.repeatPassword')}</label>
                 <input
                   {...register('confirmPassword', {
-                    required: 'تکرار رمز عبور الزامی است',
+                    required: true,
                     validate: (value) => {
                       if (watch('password') !== value) {
-                        return 'عدم تطابق با رمز عبور وارد شده'
+                        return t('register.validation.notMatching')
                       }
                     },
                   })}
@@ -115,7 +115,7 @@ const Register = () => {
                 />
                 {errors.confirmPassword && errors.confirmPassword.type === 'required' && (
                   <p className='text-danger small fw-bolder mt-1'>
-                    {errors.confirmPassword?.message}
+                    {t('register.validation.repeatPasswordRequired')}
                   </p>
                 )}
                 {errors.confirmPassword && errors.confirmPassword.type === 'validate' && (
@@ -125,24 +125,23 @@ const Register = () => {
                 )}
               </div>
               <div className='text-center mt-3'>
-                <button disabled={isSubmitting} type='submit' className='btn btn-lg btn-primary'>
-                  {t('register.register')}
-                  {/* {isSubmitting ? 'در حال ارسال' : 'ثبت نام کنید'} */}
+                <button type='submit' disabled={isSubmitting} className='btn btn-lg btn-primary'>
+                  {isSubmitting ? t('register.saving') : t('register.register')}
                 </button>
               </div>
-              {isSuccessOperation && (
-                <div className='alert alert-success text-success p-2 mt-3'>
-                  عملیات با موفقیت انجام شد. به صفحه ورود منتقل میشوید.
-                </div>
-              )}
-              {routeError && (
-                <div className='alert alert-danger p-2 mt-3'>
-                  {routeError?.response.data.map((error) => (
-                    <p>{error.description}</p>
+              {routeErrors && (
+                <div className='alert alert-danger text-danger p-2 mt-3'>
+                  {routeErrors.response?.data.map((error) => (
+                    <p className='mb-0'>{t(`register.validation.${error.code}`)}</p>
                   ))}
                 </div>
               )}
-            </Form>
+              {isSuccessOperation && (
+                <div className='alert alert-success text-success p-2 mt-3'>
+                  {t('register.successOperation')}
+                </div>
+              )}
+            </form>
           </div>
         </div>
       </div>
@@ -150,20 +149,11 @@ const Register = () => {
   )
 }
 
-export default Register
-
 export async function registerAction({request}) {
-  try {
-    const formData = await request.formData()
-    const data = Object.fromEntries(formData)
-    const response = await httpsService.post('/Users', data)
-    if (response.status !== 200) {
-      throw new Error('Registration failed')
-    }
-    return true
-  } catch (error) {
-    // eslint-disable-next-line no-throw-literal
-    throw {message: error.message, status: error.response?.status || 500}
-  }
+  const formData = await request.formData()
+  const data = Object.fromEntries(formData)
+  const response = await httpsService.post('/Users', data)
+  return response.status === 200
 }
 
+export default Register
