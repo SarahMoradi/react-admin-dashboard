@@ -80,7 +80,7 @@ const Login = () => {
 export default Login
 
 export async function loginAction({request}) {
-  const formData = await request.formData
+  const formData = await request.formData()
   const data = Object.fromEntries(formData)
   const response = await httpsService.post('/Users/login', data)
   if (response.status === 200) {
