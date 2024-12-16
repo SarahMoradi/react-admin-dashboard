@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import usFlag from '@assets/images/en.png'
-import faFlag from '@assets/images/fa.jpg'
+import usFlag from '@assets/images/us.png'
+import faFlag from '@assets/images/fa.png'
 import {useEffect, useRef, useState} from 'react'
 import {useAppContext} from '../contexts/app/app-context'
 
