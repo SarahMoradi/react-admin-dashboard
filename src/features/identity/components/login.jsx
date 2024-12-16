@@ -1,6 +1,21 @@
 import logo from '@assets/images/logo.svg'
-import {Link} from 'react-router-dom'
+import {useForm} from 'react-hook-form'
+import {Link, redirect, useSubmit} from 'react-router-dom'
+import {httpsService} from '../../../core/http-service'
 const Login = () => {
+  // register for validation
+  const {
+    register,
+    handleSubmit,
+    formState: {errors},
+  } = useForm()
+
+  const submitForm = useSubmit()
+
+  const onSubmit = (data) => {
+    submitForm(data, {method: 'post'})
+  }
+
   return (
     <>
       <div className='text-center mt-4'>
@@ -18,14 +33,36 @@ const Login = () => {
       <div className='card'>
         <div className='card-body'>
           <div className='m-sm-4'>
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className='mb-3'>
                 <label className='form-label'>موبایل</label>
-                <input className='form-control form-control-lg' />
+                {/* validation by register */}
+                <input
+                  {...register('mobile', {
+                    required: 'موبایل الزامی است',
+                    minLength: 11,
+                    maxLength: 11,
+                  })}
+                  className={`form-control form-control-lg ${errors.mobile && 'is-invalid'}`}
+                />
+                {errors.mobile && errors.mobile.type === 'required' && (
+                  <p className='text-danger small fw-bolder mt-1'>{errors.mobile?.message}</p>
+                )}
+                {errors.mobile &&
+                  (errors.mobile.type === 'minLength' || errors.mobile.type === 'maxLength') && (
+                    <p className='text-danger small fw-bolder mt-1'>موبایل باید 11 رقم باشد</p>
+                  )}
               </div>
               <div className='mb-3'>
                 <label className='form-label'>رمز عبور</label>
-                <input className='form-control form-control-lg mb-2' type='password' />
+                <input
+                  {...register('password', {required: 'رمز عبور الزامی است'})}
+                  className={`form-control form-control-lg ${errors.password && 'is-invalid'}`}
+                  type='password'
+                />
+                {errors.password && (
+                  <p className='text-danger small fw-bolder mt-1'>{errors.password?.message}</p>
+                )}
               </div>
               <div className='text-center mt-3'>
                 <button type='submit' className='btn btn-lg btn-primary'>
@@ -41,3 +78,15 @@ const Login = () => {
 }
 
 export default Login
+
+export async function loginAction({request}) {
+  const formData = await request.formData
+  const data = Object.fromEntries(formData)
+  const response = await httpsService.post('/Users/login', data)
+  if (response.status === 200) {
+    localStorage.setItem('token', response?.data.token)
+    // return redirect('/')
+  }
+
+  console.log(formData, 'formData')
+}
