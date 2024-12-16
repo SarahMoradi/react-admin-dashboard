@@ -46,8 +46,6 @@ const Register = () => {
 
   const routeError = useRouteError()
 
-  console.log(routeError, 'uuu')
-
   const {t} = useTranslation();
 
   return (
@@ -137,13 +135,13 @@ const Register = () => {
                   عملیات با موفقیت انجام شد. به صفحه ورود منتقل میشوید.
                 </div>
               )}
-              {/* {routeError && (
+              {routeError && (
                 <div className='alert alert-danger p-2 mt-3'>
                   {routeError?.response.data.map((error) => (
                     <p>{error.description}</p>
                   ))}
                 </div>
-              )} */}
+              )}
             </Form>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import logo from '@assets/images/logo.svg'
 import {useForm} from 'react-hook-form'
-import {Link, redirect, useSubmit} from 'react-router-dom'
+import {Link, redirect, useRouteError, useSubmit} from 'react-router-dom'
 import {httpsService} from '../../../core/http-service'
 const Login = () => {
   // register for validation
@@ -15,6 +15,8 @@ const Login = () => {
   const onSubmit = (data) => {
     submitForm(data, {method: 'post'})
   }
+
+  const routeError = useRouteError()
 
   return (
     <>
@@ -69,6 +71,13 @@ const Login = () => {
                   وارد شوید
                 </button>
               </div>
+              {routeError && (
+                <div className='alert alert-danger p-2 mt-3'>
+                  {routeError?.response.data.map((error) => (
+                    <p>{error.description}</p>
+                  ))}
+                </div>
+              )}
             </form>
           </div>
         </div>
@@ -85,7 +94,7 @@ export async function loginAction({request}) {
   const response = await httpsService.post('/Users/login', data)
   if (response.status === 200) {
     localStorage.setItem('token', response?.data.token)
-    // return redirect('/')
+    return redirect('/')
   }
 
   console.log(formData, 'formData')
