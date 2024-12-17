@@ -24,6 +24,11 @@ const ChangeLanguage = () => {
     }
   }, [show])
 
+  // close after selection
+  useEffect(() => {
+    setShow(false)
+  }, [language])
+
   return (
     <div className='dropdown'>
       <a className='nav-flag dropdown-toggle' onClick={() => setShow(true)}>
@@ -41,7 +46,7 @@ const ChangeLanguage = () => {
         </a>
         <a
           className='dropdown-item fw-bolder d-flex align-items-center gap-2'
-        //   style={{display: 'flex', justifyContent: 'space-around'}}
+          //   style={{display: 'flex', justifyContent: 'space-around'}}
           style={{textAlign: language === 'fa' ? 'right' : 'left'}}
           onClick={() => changeLanguage('en')}
         >
